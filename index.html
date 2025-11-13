@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Class Suggestion Hub</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.css"/>
+  <style>
+    /* [Same CSS as before, but moved to <style> for clarity] */
+    :root {
+      --bg: #f8f9fa; --card: #ffffff; --text: #212529; --primary: #4361ee;
+      --accent: #3f37c9; --danger: #e63946; --success: #2a9d8f; --border: #dee2e6;
+      --shadow: 0 4px 12px rgba(0,0,0,0.1); --neon: #00f5ff;
+    }
+    [data-theme="dark"] {
+      --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; --primary: #4895ef;
+      --accent: #5c7cfa; --border: #333; --shadow: 0 4px 12px rgba(0,0,0,0.3); --neon: #ff00ff;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
+    body { background: var(--bg); color: var(--text); transition: all 0.3s; overflow-x: hidden; }
+    #splash { position:fixed; inset:0; background:linear-gradient(135deg,var(--primary),var(--accent));
+      display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:9999;
+      animation: fadeOut 0.8s forwards 2.5s; }
+    #splash i { font-size:5rem; color:white; animation:pulse 1.5s infinite; }
+    #splash h1 { margin-top:1rem; font-size:2.5rem; color:white; text-shadow:0 0 10px var(--neon); }
+    #splash .tag { margin-top:0.5rem; font-size:1.2rem; color:#fff;
+      text-shadow:0 0 15px var(--neon),0 0 30px var(--neon); animation:glow 2s infinite alternate; }
+    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+    @keyframes glow { from{text-shadow:0 0 10px var(--neon)} to{text-shadow:0 0 30px var(--neon),0 0 50px var(--neon)} }
+    @keyframes fadeOut { to{opacity:0; visibility:hidden} }
+    @keyframes fadeIn { to{opacity:1} }
+    .container { max-width:1000px; margin:0 auto; padding:1rem; opacity:0; animation:fadeIn 0.8s forwards 2.6s; }
+    header { display:flex; justify-content:space-between; align-items:center; padding:1rem 0; border-bottom:1px solid var(--border); }
+    .logo { font-size:1.8rem; font-weight:bold; color:var(--primary); }
+    .theme-toggle { background:none; border:1px solid var(--border); padding:0.5rem; border-radius:50%; cursor:pointer; }
+    .theme-toggle:hover { background:var(--primary); color:white; }
+    .submit-box { background:var(--card); padding:1.5rem; border-radius:12px; box-shadow:var(--shadow); margin:1.5rem 0; }
+    textarea { width:100%; padding:1rem; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text); resize:none; margin-bottom:0.75rem; }
+    button { background:var(--primary); color:white; border:none; padding:0.75rem 1.5rem; border-radius:8px; cursor:pointer; font-weight:bold; }
+    button:hover { background:var(--accent); transform:translateY(-2px); }
+    .suggestions, .top-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1rem; margin:2rem 0; }
+    .card, .top-card { background:var(--card); border-radius:12px; padding:1rem; box-shadow:var(--shadow); border:1px solid var(--border); }
+    .top-card { background:linear-gradient(135deg,var(--primary),var(--accent)); color:white; text-align:center; }
+    .top-card .rank { font-size:2rem; opacity:0.3; }
+    .card:hover { transform:translateY(-4px); box-shadow:0 8px 20px rgba(0,0,0,0.15); }
+    .vote-btn { background:none; border:none; font-size:1.5rem; cursor:pointer; color:#e63946; display:flex; align-items:center; gap:0.3rem; }
+    .contact { text-align:center; padding:2rem 0; border-top:1px solid var(--border); }
+    .contact a { margin:0 1rem; color:var(--primary); text-decoration:none; display:inline-flex; align-items:center; gap:0.5rem; font-weight:500; }
+    .contact a:hover { text-decoration:underline; }
+    footer { text-align:center; padding:1.5rem 0; color:#666; font-size:0.9rem; }
+    #admin-area { background:var(--card); padding:1.5rem; border-radius:12px; box-shadow:var(--shadow); margin:2rem 0; display:none; }
+    .admin-controls { display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:1rem; }
+    .hidden { display:none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- Splash -->
+  <div id="splash">
+    <i data-lucide="lightbulb"></i>
+    <h1>Class Suggestion Hub</h1>
+    <div class="tag">by Tech Brian</div>
+  </div>
+
+  <div class="container">
+    <header>
+      <div class="logo">Suggestion Hub</div>
+      <button class="theme-toggle" id="theme-toggle">
+        <i data-lucide="moon"></i>
+      </button>
+    </header>
+
+    <div class="submit-box">
+      <textarea id="suggestion-input" placeholder="Share your idea (anonymous)" rows="3"></textarea>
+      <button id="submit-btn">Submit Suggestion</button>
+    </div>
+
+    <h2>Top 5 Ideas</h2>
+    <div class="top-grid" id="top-suggestions"></div>
+
+    <h2>All Suggestions</h2>
+    <div class="suggestions" id="suggestions-list"></div>
+
+    <div id="admin-area">
+      <input type="password" id="admin-pass" placeholder="Admin Password" />
+      <button id="login-admin">Login</button>
+      <div class="admin-controls hidden" id="admin-controls">
+        <button id="clear-all" style="background:var(--danger);">Clear All</button>
+        <button id="refresh-stats">Refresh Stats</button>
+        <div id="stats"></div>
+      </div>
+    </div>
+
+    <div class="contact">
+      <a href="https://wa.me/254748950572" target="_blank">
+        <i data-lucide="message-circle"></i>
+      </a>
+      <a href="mailto:bridah888@gmail.com">
+        <i data-lucide="mail"></i>
+      </a>
+      <a href="tel:0748950572">
+        <i data-lucide="phone"></i>
+      </a>
+    </div>
+
+    <footer>
+      Made with <i data-lucide="heart" style="color:#e63946;"></i> by <strong>Tech Brian</strong> &copy; <span id="year"></span>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
