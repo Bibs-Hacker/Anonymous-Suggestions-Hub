@@ -1,0 +1,11 @@
+{
+  "name": "class-suggestion-hub",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "live-server"
+  },
+  "dependencies": {
+    "bad-words": "^3.0.4"
+  }
+}
